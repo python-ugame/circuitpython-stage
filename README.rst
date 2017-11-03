@@ -1,5 +1,5 @@
-Stage – a tile and sprite engine for CircuitPython
-**************************************************
+Stage – a Tile and Sprite Engine
+********************************
 
 Stage is a library that lets you display tile grids and sprites on SPI-based
 RGB displays in CircuitPython. It is mostly made with video games in mind, but

@@ -8,11 +8,15 @@ def color565(r, g, b):
 
 
 class BMP16:
+    """Read 16-color BMP files."""
+
     def __init__(self, filename):
         self.filename = filename
         self.colors = 0
 
     def read_header(self):
+        """Read the file's header information."""
+
         if self.colors:
             return
         with open(self.filename, 'rb') as f:
@@ -25,6 +29,8 @@ class BMP16:
             self.colors = int.from_bytes(f.read(4), 'little')
 
     def read_palette(self):
+        """Read the color palette information."""
+
         palette = array.array('H', 0 for i in range(16))
         with open(self.filename, 'rb') as f:
             f.seek(self.data - self.colors * 4)
@@ -35,12 +41,22 @@ class BMP16:
         return palette
 
     def read_data(self, offset=0, size=-1):
+        """Read the image data."""
+
         with open(self.filename, 'rb') as f:
             f.seek(self.data + offset)
             return f.read(size)
 
 
 class Bank:
+    """
+    Store graphics for the tiles and sprites.
+
+    A single bank stores exactly 16 tiles, each 16x16 pixels in 16 possible
+    colors, and a 16-color palette. We just like the number 16.
+
+    """
+
     def __init__(self, buffer=None, palette=None):
         self.buffer = buffer
         self.palette = palette
@@ -57,6 +73,11 @@ class Bank:
 
 
 class Grid:
+    """
+    A grid is a layer of tiles that can be displayed on the screen. Each square
+    can contain any of the 16 tiles from the associated bank.
+    """
+
     def __init__(self, bank, width=8, height=8, palette=None):
         self.buffer = bytearray((width * height) >> 1)
         self.x = 0
@@ -70,6 +91,8 @@ class Grid:
                                   self.bank.palette, self.buffer)
 
     def tile(self, x, y, tile=None):
+        """Get or set what tile is displayed in the given place."""
+
         if not 0 <= x < self.width or not 0 <= y < self.height:
             return 0
         b = self.buffer[(x * self.width + y) >> 1]
@@ -82,6 +105,8 @@ class Grid:
         self.buffer[(x * self.width + y) >> 1] = b
 
     def move(self, x, y, z=None):
+        """Shift the whole layer respective to the screen."""
+
         self.x = x
         self.y = y
         if z is not None:
@@ -90,6 +115,11 @@ class Grid:
 
 
 class Sprite:
+    """
+    A sprite is a layer containing just a single tile from the associated bank,
+    that can be positioned anywhere on the screen.
+    """
+
     def __init__(self, bank, frame, x, y, z=0, rotation=0, palette=None):
         self.bank = bank
         self.palette = palette or bank.palette
@@ -104,14 +134,20 @@ class Sprite:
         self.px = x
         self.py = y
 
-    def move(self, x, y):
+    def move(self, x, y, z=None):
+        """Move the sprite to the given place."""
+
         self.px = self.x
         self.py = self.y
         self.x = x
         self.y = y
+        if z is not None:
+            self.z = z
         self.layer.move(x, y)
 
     def set_frame(self, frame=None, rotation=None):
+        """Set the current graphic and rotation of the sprite.""""
+
         if frame is not None:
             self.frame = frame
         if rotation is not None:
@@ -120,14 +156,19 @@ class Sprite:
 
 
 class Stage:
+    """
+    Represents what is being displayed on the screen.
+    """
+    buffer = bytearray(512)
+
     def __init__(self, display, fps=6):
         self.layers = []
         self.display = display
-        self.buffer = bytearray(512)
         self.last_tick = time.monotonic()
         self.tick_delay = 1 / fps
 
     def tick(self):
+        """Wait for the start of the next frame."""
         self.last_tick += self.tick_delay
         wait = max(0, self.last_tick - time.monotonic())
         if wait:
@@ -136,6 +177,8 @@ class Stage:
             self.last_tick = time.monotonic()
 
     def render(self, x0, y0, x1, y1):
+        """Update a rectangle of the screen."""
         layers = [l.layer for l in self.layers]
         self.display.block(x0, y0, x1 - 1, y1 - 1)
         _stage.render(x0, y0, x1, y1, layers, self.buffer, self.display.spi)
+
