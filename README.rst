@@ -21,7 +21,7 @@ stage
 
 st7735r
 =======
-.. automodule:: st7735
+.. automodule:: st7735r
    :members:
 
 ugame

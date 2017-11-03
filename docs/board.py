@@ -1,0 +1,10 @@
+X = None
+DOWN = None
+LEFT = None
+RIGHT = None
+UP = None
+O = None
+SCK = None
+MOSI = None
+DC = None
+SPEAKER = None

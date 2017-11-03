@@ -31,7 +31,7 @@ class BMP16:
     def read_palette(self):
         """Read the color palette information."""
 
-        palette = array.array('H', 0 for i in range(16))
+        palette = array.array('H', (0 for i in range(16)))
         with open(self.filename, 'rb') as f:
             f.seek(self.data - self.colors * 4)
             for color in range(self.colors):
@@ -146,7 +146,7 @@ class Sprite:
         self.layer.move(x, y)
 
     def set_frame(self, frame=None, rotation=None):
-        """Set the current graphic and rotation of the sprite.""""
+        """Set the current graphic and rotation of the sprite."""
 
         if frame is not None:
             self.frame = frame
