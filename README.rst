@@ -14,6 +14,8 @@ firmware, as a frozen module.
 API Reference
 *************
 
+The API reference is available at `<http://circuitpython-stage.readthedocs.io>`_.
+
 stage
 =====
 .. automodule:: stage
