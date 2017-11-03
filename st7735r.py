@@ -3,6 +3,8 @@ import time
 
 
 class ST7735R:
+    """A minimal driver for the 128x128 version of the ST7735 SPI display."""
+
     def __init__(self, spi, dc):
         self.spi = spi
         spi.try_lock()
@@ -38,6 +40,7 @@ class ST7735R:
         self.dc.value = 0
 
     def block(self, x0, y0, x1, y1):
+        """Prepare for updating a block of the screen."""
         xpos = ustruct.pack('>HH', x0 + 2, x1 + 2)
         ypos = ustruct.pack('>HH', y0 + 3, y1 + 3)
         self._write(b'\x2a', xpos)
@@ -46,6 +49,8 @@ class ST7735R:
         self.dc.value = 1
 
     def write(self, command=None, data=None):
+        """Send command and/or data to the display."""
+
         if command is not None:
             self.dc.value = 0
             self.spi.write(command)
@@ -54,6 +59,8 @@ class ST7735R:
             self.spi.write(data)
 
     def clear(self, color):
+        """Clear the display with the given color."""
+
         self.block(0, 0, 127, 127)
         pixel = color.to_bytes(2, 'big')
         data = pixel * 256
