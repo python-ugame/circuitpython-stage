@@ -1,3 +1,8 @@
+"""
+A helper module that initializes the display and buttons for the uGame
+game console. See https://hackaday.io/project/27629-game
+"""
+
 import board
 import digitalio
 import busio
