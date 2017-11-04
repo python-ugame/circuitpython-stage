@@ -43,9 +43,9 @@ class ST7735R:
         """Prepare for updating a block of the screen."""
         xpos = ustruct.pack('>HH', x0 + 2, x1 + 2)
         ypos = ustruct.pack('>HH', y0 + 3, y1 + 3)
-        self._write(b'\x2a', xpos)
-        self._write(b'\x2b', ypos)
-        self._write(b'\x2c')
+        self.write(b'\x2a', xpos)
+        self.write(b'\x2b', ypos)
+        self.write(b'\x2c')
         self.dc.value = 1
 
     def write(self, command=None, data=None):
