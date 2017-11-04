@@ -86,7 +86,7 @@ class Grid:
         self.width = width
         self.height = height
         self.bank = bank
-        self.palette = paletter or bank.palette
+        self.palette = palette or bank.palette
         self.layer = _stage.Layer(width, height, self.bank.buffer,
                                   self.bank.palette, self.buffer)
 
