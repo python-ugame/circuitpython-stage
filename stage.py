@@ -202,8 +202,7 @@ class Grid:
     can contain any of the 16 tiles from the associated bank.
     """
 
-    def __init__(self, bank, width=8, height=8, palette=None):
-        self.buffer = bytearray((width * height) >> 1)
+    def __init__(self, bank, width=8, height=8, palette=None, buffer=None):
         self.x = 0
         self.y = 0
         self.z = 0
@@ -211,6 +210,7 @@ class Grid:
         self.height = height
         self.bank = bank
         self.palette = palette or bank.palette
+        self.buffer = buffer or bytearray((width * height) >> 1)
         self.layer = _stage.Layer(width, height, self.bank.buffer,
                                   self.palette, self.buffer)
 
@@ -282,12 +282,12 @@ class Sprite:
 class Text:
     """Text layer. For displaying text."""
 
-    def __init__(self, width, height, font=FONT, palette=PALETTE):
+    def __init__(self, width, height, font=FONT, palette=PALETTE, buffer=None):
         self.width = width
         self.height = height
         self.font = font
         self.palette = palette
-        self.buffer = bytearray(width * height)
+        self.buffer = buffer or bytearray(width * height)
         self.layer = _stage.Text(width, height, self.font,
                                  self.palette, self.buffer)
         self.row = width - 1
