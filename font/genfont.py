@@ -61,7 +61,7 @@ class Font:
         self = cls(bytearray(2048))
         c = 0
         x = 0
-        y = 0
+        y = 7
         for b in data:
             self.pixel(c, x, y, b >> 4)
             x += 1
@@ -69,9 +69,9 @@ class Font:
             x += 1
             if x >= 8:
                 x = 0
-                y += 1
-                if y >= 8:
-                    y = 0
+                y -= 1
+                if y < 0:
+                    y = 7
                     c += 1
         del data
         self.palette = bmp.read_palette()

@@ -5,16 +5,16 @@ import time
 class ST7735R:
     """A minimal driver for the 128x128 version of the ST7735 SPI display."""
 
-    def __init__(self, spi, dc):
+    def __init__(self, spi, dc, rotation=0x06):
         self.spi = spi
         spi.try_lock()
         self.dc = dc
         self.dc.switch_to_output(value=1)
         spi.configure()
         for command, data, delay in (
-            (b'\x01', b'', 150),
-            (b'\x11', b'', 500),
-            (b'\x36', b'\xc8', 0),
+            (b'\x01', b'', 120),
+            (b'\x11', b'', 120),
+            (b'\x36', bytes(((rotation & 0x07) << 5,)), 0),
             (b'\x3a', b'\x05', 0),
             (b'\xb4', b'\x07', 0),
             (b'\xb1', b'\x01\x2c\x2d', 0),
