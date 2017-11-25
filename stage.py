@@ -215,12 +215,13 @@ class Grid:
         self.x = 0
         self.y = 0
         self.z = 0
+        self.stride = (width + 1) & 0xfe
         self.width = width
         self.height = height
         self.bank = bank
         self.palette = palette or bank.palette
-        self.buffer = buffer or bytearray((width * height) >> 1)
-        self.layer = _stage.Layer(width, height, self.bank.buffer,
+        self.buffer = buffer or bytearray(self.stride * height)
+        self.layer = _stage.Layer(self.stride, self.height, self.bank.buffer,
                                   self.palette, self.buffer)
 
     def tile(self, x, y, tile=None):
@@ -228,14 +229,15 @@ class Grid:
 
         if not 0 <= x < self.width or not 0 <= y < self.height:
             return 0
-        b = self.buffer[(x * self.width + y) >> 1]
+        index = (y * self.stride + x) >> 1
+        b = self.buffer[index]
         if tile is None:
-            return b & 0x0f if y & 0x01 else b >> 4
-        if y & 0x01:
+            return b & 0x0f if x & 0x01 else b >> 4
+        if x & 0x01:
             b = b & 0xf0 | tile
         else:
             b = b & 0x0f | (tile << 4)
-        self.buffer[(x * self.width + y) >> 1] = b
+        self.buffer[index] = b
 
     def move(self, x, y, z=None):
         """Shift the whole layer respective to the screen."""
@@ -270,8 +272,6 @@ class Sprite:
     def move(self, x, y, z=None):
         """Move the sprite to the given place."""
 
-        self.px = self.x
-        self.py = self.y
         self.x = x
         self.y = y
         if z is not None:
