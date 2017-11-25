@@ -21,6 +21,8 @@ K_O = 0x20
 
 dc = digitalio.DigitalInOut(board.DC)
 spi = busio.SPI(clock=board.SCK, MOSI=board.MOSI)
+spi.try_lock()
+spi.configure(baudrate=24000000, polarity=0, phase=0)
 display = st7735r.ST7735R(spi, dc, 0b101)
 buttons = gamepad.GamePad(
     digitalio.DigitalInOut(board.X),

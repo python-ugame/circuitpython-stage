@@ -7,10 +7,8 @@ class ST7735R:
 
     def __init__(self, spi, dc, rotation=0x06):
         self.spi = spi
-        spi.try_lock()
         self.dc = dc
         self.dc.switch_to_output(value=1)
-        spi.configure()
         for command, data, delay in (
             (b'\x01', b'', 120),
             (b'\x11', b'', 120),
@@ -36,7 +34,6 @@ class ST7735R:
         ):
             self.write(command, data)
             time.sleep(delay / 1000)
-        spi.configure(baudrate=24000000, polarity=0, phase=0)
         self.dc.value = 0
 
     def block(self, x0, y0, x1, y1):
