@@ -5,13 +5,17 @@ import time
 class ST7735R:
     """A minimal driver for the 128x128 version of the ST7735 SPI display."""
 
+    width = 128
+    height = 128
+
     def __init__(self, spi, dc, rotation=0x06):
         self.spi = spi
         self.dc = dc
         self.dc.switch_to_output(value=1)
+        time.sleep(0.1)
         for command, data, delay in (
-            (b'\x01', b'', 120),
-            (b'\x11', b'', 120),
+            (b'\x01', b'', 150),
+            (b'\x11', b'', 500),
             (b'\x36', bytes(((rotation & 0x07) << 5,)), 0),
             (b'\x3a', b'\x05', 0),
             (b'\xb4', b'\x07', 0),
@@ -30,7 +34,7 @@ class ST7735R:
             (b'\xe1', b'\x03\x1d\x07\x06\x2E\x2C\x29\x2D'
              b'\x2E\x2E\x37\x3F\x00\x00\x02\x10', 0),
             (b'\x13', b'', 10),
-            (b'\x29', b'', 100),
+            (b'\x29', b'', 120),
         ):
             self.write(command, data)
             time.sleep(delay / 1000)
@@ -55,11 +59,11 @@ class ST7735R:
             self.dc.value = 1
             self.spi.write(data)
 
-    def clear(self, color):
+    def clear(self, color=0x00):
         """Clear the display with the given color."""
 
-        self.block(0, 0, 127, 127)
+        self.block(0, 0, self.width - 1, self.height - 1)
         pixel = color.to_bytes(2, 'big')
         data = pixel * 256
-        for count in range(64):
+        for count in range(self.width * self.height // 256):
             self.write(None, data)

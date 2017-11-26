@@ -246,7 +246,28 @@ class Grid:
         self.y = y
         if z is not None:
             self.z = z
-        self.layer.move(x, y)
+        self.layer.move(int(x), int(y))
+
+
+class WallGrid(Grid):
+    def __init__(self, grid, walls, bank, palette=None):
+        super().__init__(bank, grid.width + 1, grid.height + 1, palette)
+        self.grid = grid
+        self.walls = walls
+        self.update()
+        self.move(-8, -8)
+
+    def update(self):
+        for y in range(9):
+            for x in range(9):
+                t = 0
+                bit = 1
+                for dy in (-1, 0):
+                    for dx in (-1, 0):
+                        if self.grid.tile(x + dx, y + dy) in self.walls:
+                            t |= bit
+                        bit <<= 1
+                self.tile(x, y, t)
 
 
 class Sprite:
@@ -276,7 +297,7 @@ class Sprite:
         self.y = y
         if z is not None:
             self.z = z
-        self.layer.move(x, y)
+        self.layer.move(int(x), int(y))
 
     def set_frame(self, frame=None, rotation=None):
         """Set the current graphic and rotation of the sprite."""
@@ -286,6 +307,10 @@ class Sprite:
         if rotation is not None:
             self.rotation = rotation
         self.layer.frame(self.frame, self.rotation)
+
+    def update(self):
+        self.px = self.x
+        self.py = self.y
 
 
 class Text:
@@ -319,7 +344,7 @@ class Text:
         self.y = y
         if z is not None:
             self.z = z
-        self.layer.move(x, y)
+        self.layer.move(int(x), int(y))
 
     def cursor(self, x=None, y=None):
         """Move the text cursor to the specified row and column."""
@@ -355,6 +380,8 @@ class Stage:
     def __init__(self, display, fps=6):
         self.layers = []
         self.display = display
+        self.width = display.width
+        self.height = display.height
         self.last_tick = time.monotonic()
         self.tick_delay = 1 / fps
 
@@ -367,9 +394,23 @@ class Stage:
         else:
             self.last_tick = time.monotonic()
 
-    def render(self, x0, y0, x1, y1):
+    def render_block(self, x0=0, y0=0, x1=None, y1=None):
         """Update a rectangle of the screen."""
+        if x1 is None:
+            x1 = self.width
+        if y1 is None:
+            y1 = self.height
         layers = [l.layer for l in self.layers]
         self.display.block(x0, y0, x1 - 1, y1 - 1)
         _stage.render(x0, y0, x1, y1, layers, self.buffer, self.display.spi)
+
+    def render_sprites(self, sprites):
+        for sprite in sprites:
+            x0 = max(0, min(self.width - 1, min(sprite.px, sprite.x)))
+            y0 = max(0, min(self.height - 1, min(sprite.py, sprite.y)))
+            x1 = max(1, min(self.width, max(sprite.px, sprite.x) + 16))
+            y1 = max(1, min(self.height, max(sprite.py, sprite.y) + 16))
+            if x0 == x1 or y0 == y1:
+                return
+            self.render_block(x0, y0, x1, y1)
 
