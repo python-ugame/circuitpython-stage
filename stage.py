@@ -132,6 +132,14 @@ def color565(r, g, b):
     return (r & 0xf8) << 8 | (g & 0xfc) << 3 | b >> 3
 
 
+def collide(ax0, ay0, ax1, ay1, bx0, by0, bx1=None, by1=None):
+    if bx1 is None:
+        bx1 = bx0
+    if by1 is None:
+        by1 = by0
+    return not (ax1 < bx0 or ay1 < by0 or ax0 > bx1 or ay0 > by1)
+
+
 class BMP16:
     """Read 16-color BMP files."""
 

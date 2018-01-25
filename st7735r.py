@@ -12,10 +12,11 @@ class ST7735R:
         self.spi = spi
         self.dc = dc
         self.dc.switch_to_output(value=1)
+        self.rotation = rotation
         time.sleep(0.1)
         for command, data, delay in (
-            (b'\x01', b'', 150),
-            (b'\x11', b'', 500),
+            (b'\x01', b'', 120),
+            (b'\x11', b'', 120),
             (b'\x36', bytes(((rotation & 0x07) << 5,)), 0),
             (b'\x3a', b'\x05', 0),
             (b'\xb4', b'\x07', 0),
@@ -42,8 +43,18 @@ class ST7735R:
 
     def block(self, x0, y0, x1, y1):
         """Prepare for updating a block of the screen."""
-        xpos = ustruct.pack('>HH', x0 + 2, x1 + 2)
-        ypos = ustruct.pack('>HH', y0 + 3, y1 + 3)
+        if self.rotation & 0x01:
+            x0 += 3
+            x1 += 3
+            y0 += 2
+            y1 += 2
+        else:
+            x0 += 2
+            x1 += 2
+            y0 += 3
+            y1 += 3
+        xpos = ustruct.pack('>HH', x0, x1)
+        ypos = ustruct.pack('>HH', y0, y1)
         self.write(b'\x2a', xpos)
         self.write(b'\x2b', ypos)
         self.write(b'\x2c')
