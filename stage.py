@@ -129,10 +129,12 @@ PALETTE = (b'\xf8\x1f\x00\x00\xcey\xff\xff\xf8\x1f\x00\x19\xfc\xe0\xfd\xe0'
 
 
 def color565(r, g, b):
+    """Convert 24-bit RGB color to 16-bit."""
     return (r & 0xf8) << 8 | (g & 0xfc) << 3 | b >> 3
 
 
 def collide(ax0, ay0, ax1, ay1, bx0, by0, bx1=None, by1=None):
+    """Return True if the two rectangles intersect."""
     if bx1 is None:
         bx1 = bx0
     if by1 is None:
@@ -204,6 +206,7 @@ class Bank:
 
     @classmethod
     def from_bmp16(cls, filename):
+        """Read the palette from a file."""
         bmp = BMP16(filename)
         bmp.read_header()
         if bmp.width != 16 or bmp.height != 256:
@@ -258,6 +261,10 @@ class Grid:
 
 
 class WallGrid(Grid):
+    """
+    A special grid, shifted from its parents by half a tile, useful for making
+    nice-looking corners of walls and similar structures."""
+
     def __init__(self, grid, walls, bank, palette=None):
         super().__init__(bank, grid.width + 1, grid.height + 1, palette)
         self.grid = grid
@@ -413,6 +420,7 @@ class Stage:
         _stage.render(x0, y0, x1, y1, layers, self.buffer, self.display.spi)
 
     def render_sprites(self, sprites):
+        """Update the spots taken by all the sprites in the list."""
         for sprite in sprites:
             x0 = max(0, min(self.width - 1, min(sprite.px, sprite.x)))
             y0 = max(0, min(self.height - 1, min(sprite.py, sprite.y)))
