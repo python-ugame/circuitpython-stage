@@ -270,7 +270,7 @@ class WallGrid(Grid):
         self.grid = grid
         self.walls = walls
         self.update()
-        self.move(-8, -8)
+        self.move(self.x - 8, self.y - 8)
 
     def update(self):
         for y in range(9):
