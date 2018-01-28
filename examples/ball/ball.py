@@ -10,9 +10,9 @@ class Ball(stage.Sprite):
 
     def update(self):
         super().update()
-        self.set_frame((self.frame) % 4 + 1)
+        self.set_frame(self.frame % 4 + 1)
         self.move(self.x + self.dx, self.y + self.dy)
-        if not 0 <= self.x < 128 - 16:
+        if not 0 < self.x < 112:
             self.dx = -self.dx
         if not 0 < self.y < 112:
             self.dy = -self.dy

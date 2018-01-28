@@ -324,11 +324,11 @@ class Sprite:
 class Text:
     """Text layer. For displaying text."""
 
-    def __init__(self, width, height, font=FONT, palette=PALETTE, buffer=None):
+    def __init__(self, width, height, font=None, palette=None, buffer=None):
         self.width = width
         self.height = height
-        self.font = font
-        self.palette = palette
+        self.font = font or FONT
+        self.palette = palette or PALETTE
         self.buffer = buffer or bytearray(width * height)
         self.layer = _stage.Text(width, height, self.font,
                                  self.palette, self.buffer)
