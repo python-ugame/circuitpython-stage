@@ -324,8 +324,11 @@ class Sprite:
         self.layer.frame(self.frame, self.rotation)
 
     def update(self):
-        self.px = self.x
-        self.py = self.y
+        pass
+
+    def _updated(self):
+        self.px = int(self.x)
+        self.py = int(self.y)
 
 
 class Text:
@@ -429,4 +432,4 @@ class Stage:
             if x0 == x1 or y0 == y1:
                 return
             self.render_block(x0, y0, x1, y1)
-
+            sprite._updated()
