@@ -22,10 +22,11 @@ K_O = 0x20
 
 
 class Audio:
+    last_audio = None
+
     def __init__(self):
         self.mute_pin = digitalio.DigitalInOut(board.MUTE)
         self.mute_pin.switch_to_output(value=1)
-        self.last_audio = None
 
     def play(self, audio_file):
         self.stop()
