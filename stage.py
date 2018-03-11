@@ -344,6 +344,9 @@ class Text:
                                  self.palette, self.buffer)
         self.column = 0
         self.row = 0
+        self.x = 0
+        self.y = 0
+        self.z = 0
 
     def char(self, x, y, c=None, hightlight=False):
         """Get or set the character at the given location."""
