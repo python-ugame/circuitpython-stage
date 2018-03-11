@@ -430,6 +430,6 @@ class Stage:
             x1 = max(1, min(self.width, max(sprite.px, sprite.x) + 16))
             y1 = max(1, min(self.height, max(sprite.py, sprite.y) + 16))
             if x0 == x1 or y0 == y1:
-                return
+                continue
             self.render_block(x0, y0, x1, y1)
             sprite._updated()
