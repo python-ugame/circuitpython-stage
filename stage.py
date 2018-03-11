@@ -425,10 +425,10 @@ class Stage:
     def render_sprites(self, sprites):
         """Update the spots taken by all the sprites in the list."""
         for sprite in sprites:
-            x0 = max(0, min(self.width - 1, min(sprite.px, sprite.x)))
-            y0 = max(0, min(self.height - 1, min(sprite.py, sprite.y)))
-            x1 = max(1, min(self.width, max(sprite.px, sprite.x) + 16))
-            y1 = max(1, min(self.height, max(sprite.py, sprite.y) + 16))
+            x0 = max(0, min(self.width - 1, min(sprite.px, int(sprite.x))))
+            y0 = max(0, min(self.height - 1, min(sprite.py, int(sprite.y))))
+            x1 = max(1, min(self.width, max(sprite.px, int(sprite.x)) + 16))
+            y1 = max(1, min(self.height, max(sprite.py, int(sprite.y)) + 16))
             if x0 == x1 or y0 == y1:
                 continue
             self.render_block(x0, y0, x1, y1)
