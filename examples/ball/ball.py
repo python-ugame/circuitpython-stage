@@ -29,7 +29,7 @@ ball3 = Ball(111, 64)
 game = stage.Stage(ugame.display, 12)
 sprites = [ball1, ball2, ball3]
 game.layers = [text, ball1, ball2, ball3, background]
-game.render_block()
+game.render_block(0, 0, 128, 128)
 
 while True:
     for sprite in sprites:
