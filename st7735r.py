@@ -1,4 +1,7 @@
-import ustruct
+try:
+    import struct
+except ImportError:
+    import ustruct as struct
 import time
 
 
@@ -53,8 +56,8 @@ class ST7735R:
             x1 += 2
             y0 += 3
             y1 += 3
-        xpos = ustruct.pack('>HH', x0, x1)
-        ypos = ustruct.pack('>HH', y0, y1)
+        xpos = struct.pack('>HH', x0, x1)
+        ypos = struct.pack('>HH', y0, y1)
         self.write(b'\x2a', xpos)
         self.write(b'\x2b', ypos)
         self.write(b'\x2c')
