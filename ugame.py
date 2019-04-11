@@ -9,8 +9,14 @@ import busio
 import audioio
 import analogio
 
-import st7735r
 import gamepad
+
+
+try:
+    import displayio
+    HAS_DISPLAYIO = True
+except ImportErrror:
+    HAS_DISPLAYIO = False
 
 
 K_X = 0x01
@@ -41,15 +47,7 @@ class Audio:
         self.mute_pin.value = not value
 
 
-dc = digitalio.DigitalInOut(board.DC)
-cs = digitalio.DigitalInOut(board.CS)
-cs.switch_to_output(value=1)
-spi = busio.SPI(clock=board.SCK, MOSI=board.MOSI)
-spi.try_lock()
-spi.configure(baudrate=24000000, polarity=0, phase=0)
-cs.value = 0
-display = st7735r.ST7735R(spi, dc, 0b101)
-
+display_bus = board.DISPLAY.bus
 buttons = gamepad.GamePad(
     digitalio.DigitalInOut(board.X),
     digitalio.DigitalInOut(board.DOWN),
