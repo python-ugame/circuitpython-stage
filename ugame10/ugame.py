@@ -60,7 +60,7 @@ class Display:
         self.bus.send(0x2c, b'')
 
 
-display = Display()
+display = board.DISPLAY
 buttons = gamepad.GamePad(
     digitalio.DigitalInOut(board.X),
     digitalio.DigitalInOut(board.DOWN),

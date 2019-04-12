@@ -422,8 +422,7 @@ class Stage:
         if y1 is None:
             y1 = self.height
         layers = [l.layer for l in self.layers]
-        self.display.block(x0, y0, x1 - 1, y1 - 1)
-        _stage.render(x0, y0, x1, y1, layers, self.buffer, self.display.bus)
+        _stage.render(x0, y0, x1, y1, layers, self.buffer, self.display)
 
     def render_sprites(self, sprites):
         """Update the spots taken by all the sprites in the list."""
@@ -435,7 +434,6 @@ class Stage:
             y1 = max(1, min(self.height, max(sprite.py, int(sprite.y)) + 16))
             if x0 == x1 or y0 == y1:
                 continue
-            self.display.block(x0, y0, x1 - 1, y1 - 1)
             _stage.render(x0, y0, x1, y1, layers, self.buffer,
-                          self.display.bus)
+                          self.display)
             sprite._updated()
