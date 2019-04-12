@@ -40,26 +40,6 @@ class Audio:
         self.mute_pin.value = not value
 
 
-class Display:
-    buffer = bytearray(4)
-
-    def __init__(self):
-        self.bus = board.DISPLAY.bus
-        self.width = board.DISPLAY.width
-        self.height = board.DISPLAY.height
-
-    def block(self, x0, y0, x1, y1):
-        x0 += 3
-        x1 += 3
-        y0 += 2
-        y1 += 2
-        struct.pack_into('>HH', self.buffer, 0, x0, x1)
-        self.bus.send(0x2a, self.buffer)
-        struct.pack_into('>HH', self.buffer, 0, y0, y1)
-        self.bus.send(0x2b, self.buffer)
-        self.bus.send(0x2c, b'')
-
-
 display = board.DISPLAY
 buttons = gamepad.GamePad(
     digitalio.DigitalInOut(board.X),
