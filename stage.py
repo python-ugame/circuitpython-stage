@@ -395,6 +395,11 @@ class Text:
 class Stage:
     """
     Represents what is being displayed on the screen.
+
+    The ``display`` parameter is displayio.Display representing an initialized
+    display connected to the device.
+
+    The ``fps`` specifies the maximum frame rate to be enforced.
     """
     buffer = bytearray(512)
 
