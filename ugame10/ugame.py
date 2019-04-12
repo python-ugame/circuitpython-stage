@@ -26,15 +26,15 @@ class Audio:
     def __init__(self):
         self.mute_pin = digitalio.DigitalInOut(board.MUTE)
         self.mute_pin.switch_to_output(value=1)
+        self.audio = audioio.AudioOut(board.SPEAKER)
 
-    def play(self, audio_file):
+    def play(self, audio_file, loop=False):
         self.stop()
-        self.last_audio = audioio.AudioOut(board.SPEAKER, audio_file)
-        self.last_audio.play()
+        wave = audioio.WaveFile(audio_file)
+        self.audio.play(wave, loop=loop)
 
     def stop(self):
-        if self.last_audio:
-            self.last_audio.stop()
+        self.audio.stop()
 
     def mute(self, value=True):
         self.mute_pin.value = not value
