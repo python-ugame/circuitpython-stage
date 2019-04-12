@@ -8,15 +8,8 @@ import digitalio
 import busio
 import audioio
 import analogio
-
+import struct
 import gamepad
-
-
-try:
-    import displayio
-    HAS_DISPLAYIO = True
-except ImportErrror:
-    HAS_DISPLAYIO = False
 
 
 K_X = 0x01
@@ -47,7 +40,27 @@ class Audio:
         self.mute_pin.value = not value
 
 
-display_bus = board.DISPLAY.bus
+class Display:
+    buffer = bytearray(4)
+
+    def __init__(self):
+        self.bus = board.DISPLAY.bus
+        self.width = board.DISPLAY.width
+        self.height = board.DISPLAY.height
+
+    def block(self, x0, y0, x1, y1):
+        x0 += 3
+        x1 += 3
+        y0 += 2
+        y1 += 2
+        struct.pack_into('>HH', self.buffer, 0, x0, x1)
+        self.bus.send(0x2a, self.buffer)
+        struct.pack_into('>HH', self.buffer, 0, y0, y1)
+        self.bus.send(0x2b, self.buffer)
+        self.bus.send(0x2c, b'')
+
+
+display = Display()
 buttons = gamepad.GamePad(
     digitalio.DigitalInOut(board.X),
     digitalio.DigitalInOut(board.DOWN),

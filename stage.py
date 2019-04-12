@@ -1,7 +1,6 @@
 import time
 import array
 import _stage
-import struct
 
 
 FONT = (b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
@@ -131,7 +130,7 @@ PALETTE = (b'\xf8\x1f\x00\x00\xcey\xff\xff\xf8\x1f\x00\x19\xfc\xe0\xfd\xe0'
 
 def color565(r, g, b):
     """Convert 24-bit RGB color to 16-bit."""
-    return (b & 0xf8) << 8 | (g & 0xfc) << 3 | r >> 3
+    return (r & 0xf8) << 8 | (g & 0xfc) << 3 | b >> 3
 
 
 def collide(ax0, ay0, ax1, ay1, bx0, by0, bx1=None, by1=None):
@@ -399,11 +398,11 @@ class Stage:
     """
     buffer = bytearray(512)
 
-    def __init__(self, display_bus, fps=6):
+    def __init__(self, display, fps=6):
         self.layers = []
-        self.display_bus = display_bus
-        self.width = 128
-        self.height = 128
+        self.display = display
+        self.width = display.width
+        self.height = display.height
         self.last_tick = time.monotonic()
         self.tick_delay = 1 / fps
 
@@ -416,17 +415,6 @@ class Stage:
         else:
             self.last_tick = time.monotonic()
 
-    def _block(self, x0, y0, x1, y1):
-        x0 += 3
-        x1 += 3
-        y0 += 2
-        y1 += 2
-        xpos = struct.pack('>HH', x0, x1)
-        self.display_bus.send(0x2a, xpos)
-        ypos = struct.pack('>HH', y0, y1)
-        self.display_bus.send(0x2b, ypos)
-        self.display_bus.send(0x2c, b'')
-
     def render_block(self, x0=0, y0=0, x1=None, y1=None):
         """Update a rectangle of the screen."""
         if x1 is None:
@@ -434,8 +422,8 @@ class Stage:
         if y1 is None:
             y1 = self.height
         layers = [l.layer for l in self.layers]
-        self._block(x0, y0, x1 - 1, y1 - 1)
-        _stage.render(x0, y0, x1, y1, layers, self.buffer, self.display_bus)
+        self.display.block(x0, y0, x1 - 1, y1 - 1)
+        _stage.render(x0, y0, x1, y1, layers, self.buffer, self.display.bus)
 
     def render_sprites(self, sprites):
         """Update the spots taken by all the sprites in the list."""
@@ -447,7 +435,7 @@ class Stage:
             y1 = max(1, min(self.height, max(sprite.py, int(sprite.y)) + 16))
             if x0 == x1 or y0 == y1:
                 continue
-            self._block(x0, y0, x1 - 1, y1 - 1)
+            self.display.block(x0, y0, x1 - 1, y1 - 1)
             _stage.render(x0, y0, x1, y1, layers, self.buffer,
-                          self.display_bus)
+                          self.display.bus)
             sprite._updated()
