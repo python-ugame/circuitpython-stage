@@ -1,5 +1,7 @@
 import time
 import array
+import digitalio
+import audioio
 import _stage
 
 
@@ -140,6 +142,30 @@ def collide(ax0, ay0, ax1, ay1, bx0, by0, bx1=None, by1=None):
     if by1 is None:
         by1 = by0
     return not (ax1 < bx0 or ay1 < by0 or ax0 > bx1 or ay0 > by1)
+
+
+class Audio:
+    last_audio = None
+
+    def __init__(self, speaker_pin, mute_pin=None):
+        if mute_pin:
+            self.mute_pin = digitalio.DigitalInOut(mute_pin)
+            self.mute_pin.switch_to_output(value=0)
+        else:
+            self.mute_pin = None
+        self.audio = audioio.AudioOut(speaker_pin)
+
+    def play(self, audio_file, loop=False):
+        self.stop()
+        wave = audioio.WaveFile(audio_file)
+        self.audio.play(wave, loop=loop)
+
+    def stop(self):
+        self.audio.stop()
+
+    def mute(self, value=True):
+        if self.mute_pin:
+            self.mute_pin.value = not value
 
 
 class BMP16:
