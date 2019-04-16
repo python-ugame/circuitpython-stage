@@ -7,6 +7,8 @@ import board
 import digitalio
 import gamepadshift
 import stage
+import displayio
+import busio
 
 
 K_X = 0x02
@@ -18,8 +20,18 @@ K_O = 0x01
 K_START = 0x04
 K_SECLECT = 0x08
 
+# re-initialize the display for correct rotation and RGB mode
+displayio.release_displays()
+_tft_spi = busio.SPI(clock=board.TFT_SCK, MOSI=board.TFT_MOSI)
+_tft_spi.try_lock()
+_tft_spi.configure(baudrate=24000000)
+_tft_spi.unlock()
+_fourwire = displayio.FourWire(_tft_spi, command=board.TFT_DC,
+                               chip_select=board.TFT_CS)
+display = displayio.Display(_fourwire, b'\x36\x01\xa8', width=160, height=128,
+                            rotation=0, backlight_pin=board.TFT_LITE)
+display.auto_brightness = True
 
-display = board.DISPLAY
 buttons = gamepadshift.GamePadShift(
     digitalio.DigitalInOut(board.BUTTON_OUT),
     digitalio.DigitalInOut(board.BUTTON_CLOCK),
