@@ -33,8 +33,8 @@ display = displayio.Display(_fourwire, b'\x36\x01\xa8', width=160, height=128,
 display.auto_brightness = True
 
 buttons = gamepadshift.GamePadShift(
-    digitalio.DigitalInOut(board.BUTTON_OUT),
     digitalio.DigitalInOut(board.BUTTON_CLOCK),
+    digitalio.DigitalInOut(board.BUTTON_OUT),
     digitalio.DigitalInOut(board.BUTTON_LATCH),
 )
 
