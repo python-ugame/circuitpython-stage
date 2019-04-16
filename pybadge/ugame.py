@@ -5,7 +5,7 @@ game console. See https://hackaday.io/project/27629-game
 
 import board
 import digitalio
-import gamepad
+import gamepadshift
 import stage
 
 
@@ -20,7 +20,7 @@ K_SECLECT = 0x08
 
 
 display = board.DISPLAY
-buttons = gamepad.GamePadShift(
+buttons = gamepadshift.GamePadShift(
     digitalio.DigitalInOut(board.BUTTON_OUT),
     digitalio.DigitalInOut(board.BUTTON_CLOCK),
     digitalio.DigitalInOut(board.BUTTON_LATCH),
