@@ -52,7 +52,7 @@ i2c = board.I2C()
 spi = board.SPI()
 ss = Seesaw(i2c, 0x5E)
 backlight = PWMOut(ss, 5)
-brightness = 1  # 0 full on, 1 full off, 0.5 half
+brightness = 1  # 0 full off, 1 full on, 0.5 half
 backlight.duty_cycle = int(255 * min(max(1 - brightness, 0.0), 1.0))
 ss.pin_mode_bulk(button_mask, ss.INPUT_PULLUP)
 displayio.release_displays()
