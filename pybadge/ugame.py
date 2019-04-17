@@ -18,7 +18,7 @@ K_RIGHT = 0x10
 K_UP = 0x40
 K_O = 0x01
 K_START = 0x04
-K_SECLECT = 0x08
+K_SELECT = 0x08
 
 # re-initialize the display for correct rotation and RGB mode
 displayio.release_displays()
