@@ -1,4 +1,3 @@
-from collections import namedtuple
 import board
 from micropython import const
 from adafruit_seesaw.seesaw import Seesaw
@@ -6,25 +5,17 @@ from adafruit_seesaw.pwmout import PWMOut
 import stage
 import displayio
 
-BUTTON_RIGHT = const(7)
-BUTTON_DOWN = const(4)
-BUTTON_LEFT = const(3)
-BUTTON_UP = const(2)
-BUTTON_SEL = const(11)
-BUTTON_A = const(10)
-BUTTON_B = const(9)
 
-Buttons = namedtuple("Buttons", "up down left right a b select")
+K_UP = const(4)
+K_LEFT = const(8)
+K_DOWN = const(16)
+K_RIGHT = const(128)
+K_X = const(512)
+K_O = const(1024)
+K_SELECT = const(2048)
+K_START = const(0)
 
-button_mask = ((1 << BUTTON_RIGHT) |
-                (1 << BUTTON_DOWN) |
-                (1 << BUTTON_LEFT) |
-                (1 << BUTTON_UP) |
-                (1 << BUTTON_SEL) |
-                (1 << BUTTON_A) |
-                (1 << BUTTON_B))
-
-_INIT_SEQUENCE = bytearray(
+_INIT_SEQUENCE = (
     b"\x01\x80\x96"  # SWRESET and Delay 150ms
     b"\x11\x80\xff"  # SLPOUT and Delay
     b"\xb1\x03\x01\x2C\x2D"  # _FRMCTR1
@@ -38,7 +29,7 @@ _INIT_SEQUENCE = bytearray(
     b"\xc4\x02\x8a\xee"
     b"\xc5\x01\x0e"  # _VMCTR1 VCOMH = 4V, VOML = -1.1V
     b"\x20\x00"  # _INVOFF
-    b"\x36\x01\x68"  # _MADCTL rotate and color
+    b"\x36\x01\x68"  # _MADCTL bottom to top refresh
     # 1 clk cycle nonoverlap, 2 cycle gate rise, 3 sycle osc equalie,
     # fix on VTL
     b"\x3a\x01\x05"  # COLMOD - 16bit color
@@ -48,33 +39,44 @@ _INIT_SEQUENCE = bytearray(
     b"\x29\x80\x64"  # _DISPON
 )
 
+
+class GamePadSeesaw:
+    mask = K_RIGHT | K_DOWN | K_LEFT | K_UP | K_SELECT | K_O | K_X
+
+    def __init__(self, ss):
+        ss.pin_mode_bulk(self.mask, ss.INPUT_PULLUP)
+        self.ss = ss
+
+    def get_pressed(self):
+        return self.ss.digital_read_bulk(self.mask)
+
+
+class DummyAudio:
+    def play(self, f, loop=False):
+        pass
+
+    def stop(self):
+        pass
+
+    def mute(self, mute):
+        pass
+
+
 i2c = board.I2C()
-spi = board.SPI()
 ss = Seesaw(i2c, 0x5E)
-backlight = PWMOut(ss, 5)
-brightness = 1  # 0 full off, 1 full on, 0.5 half
-backlight.duty_cycle = int(255 * min(max(1 - brightness, 0.0), 1.0))
-ss.pin_mode_bulk(button_mask, ss.INPUT_PULLUP)
+spi = board.SPI()
 displayio.release_displays()
 while not spi.try_lock():
     pass
 spi.configure(baudrate=24000000)
 spi.unlock()
 ss.pin_mode(8, ss.OUTPUT)
-ss.digital_write(8, True)  # Reset the Display via Seesaw
-display_bus = displayio.FourWire(spi,
-                                 command=board.D6,
-                                 chip_select=board.D5)
-display = displayio.Display(display_bus, _INIT_SEQUENCE, width=160, height=80, rowstart=24)
-ss.pin_mode_bulk(button_mask, ss.INPUT_PULLUP)
-# clean up some RAM
-del _INIT_SEQUENCE, brightness
-
-def buttons():
-    """
-    Return a set of buttons with current push values
-    """
-    button_values = ss.digital_read_bulk(button_mask)
-    return Buttons(*[not button_values & (1 << button) for button in
-                     (BUTTON_UP, BUTTON_DOWN, BUTTON_LEFT, BUTTON_RIGHT,
-                      BUTTON_A, BUTTON_B, BUTTON_SEL)])
+ss.digital_write(8, True) # reset display
+display_bus = displayio.FourWire(spi, command=board.D6, chip_select=board.D5)
+display = displayio.Display(display_bus, _INIT_SEQUENCE, width=160, height=80,
+                            rowstart=24)
+buttons = GamePadSeesaw(ss)
+audio = DummyAudio()
+backlight = PWMOut(ss, 5)
+backlight.duty_cycle = 0
+del _INIT_SEQUENCE
