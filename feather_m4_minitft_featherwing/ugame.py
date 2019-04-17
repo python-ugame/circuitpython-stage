@@ -52,7 +52,8 @@ i2c = board.I2C()
 spi = board.SPI()
 ss = Seesaw(i2c, 0x5E)
 backlight = PWMOut(ss, 5)
-backlight.duty_cycle = int(255 * min(max(1 - 0.1, 0.0), 1.0))
+brightness = 1  # 0 full on, 1 full off, 0.5 half
+backlight.duty_cycle = int(255 * min(max(1 - brightness, 0.0), 1.0))
 ss.pin_mode_bulk(button_mask, ss.INPUT_PULLUP)
 displayio.release_displays()
 while not spi.try_lock():
@@ -62,10 +63,12 @@ spi.unlock()
 ss.pin_mode(8, ss.OUTPUT)
 ss.digital_write(8, True)  # Reset the Display via Seesaw
 display_bus = displayio.FourWire(spi,
-                                 command=board.D10,
-                                 chip_select=board.D9)
+                                 command=board.D6,
+                                 chip_select=board.D5)
 display = displayio.Display(display_bus, _INIT_SEQUENCE, width=160, height=80, rowstart=24)
 ss.pin_mode_bulk(button_mask, ss.INPUT_PULLUP)
+# clean up some RAM
+del _INIT_SEQUENCE, brightness
 
 def buttons():
     """
