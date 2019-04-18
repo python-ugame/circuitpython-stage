@@ -31,7 +31,6 @@ sprites = [ball1, ball2, ball3]
 game.layers = [text, ball1, ball2, ball3, background]
 game.render_block(0, 0, (ugame.display.width), (ugame.display.height))
 
-
 while True:
     for sprite in sprites:
         sprite.update()
