@@ -48,7 +48,7 @@ class GamePadSeesaw:
         self.ss = ss
 
     def get_pressed(self):
-        return self.ss.digital_read_bulk(self.mask)
+        return ~self.ss.digital_read_bulk(self.mask)
 
 
 class DummyAudio:
