@@ -28,6 +28,21 @@ st7735r
 
 ugame
 =======
-.. automodule:: ugame
-   :members:
+.. module:: ugame
 
+.. data:: display
+
+    An initialized display, that can be used for creating Stage objects.
+
+.. data:: buttons
+
+    An instance of ``GamePad`` or other similar class, that has a
+    ``get_pressed`` method for retrieving a bit mask of pressed buttons. That
+    value can be then checked with & operator against the constants: ``K_UP``,
+    ``K_DOWN``, ``K_LEFT``, ``K_RIGHT``, ``K_X``, ``K_O`` and on some platforms
+    also: ``K_START`` and ``K_SELECT``.
+
+.. data:: audio
+
+    And instance of the ``Audio`` or other similar class, that has ``play``,
+    ``stop`` and ``mute`` methods.

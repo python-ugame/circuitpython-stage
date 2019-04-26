@@ -145,6 +145,7 @@ def collide(ax0, ay0, ax1, ay1, bx0, by0, bx1=None, by1=None):
 
 
 class Audio:
+    """Play sounds."""
     last_audio = None
 
     def __init__(self, speaker_pin, mute_pin=None):
@@ -156,14 +157,21 @@ class Audio:
         self.audio = audioio.AudioOut(speaker_pin)
 
     def play(self, audio_file, loop=False):
+        """
+        Start playing an open file ``audio_file``. If ``loop`` is ``True``,
+        repeat until stopped. This function doesn't block, the sound is
+        played in the background.
+        """
         self.stop()
         wave = audioio.WaveFile(audio_file)
         self.audio.play(wave, loop=loop)
 
     def stop(self):
+        """Stop playing whatever sound is playing."""
         self.audio.stop()
 
     def mute(self, value=True):
+        """Enable or disable all sounds."""
         if self.mute_pin:
             self.mute_pin.value = not value
 
@@ -289,7 +297,8 @@ class Grid:
 class WallGrid(Grid):
     """
     A special grid, shifted from its parents by half a tile, useful for making
-    nice-looking corners of walls and similar structures."""
+    nice-looking corners of walls and similar structures.
+    """
 
     def __init__(self, grid, walls, bank, palette=None):
         super().__init__(bank, grid.width + 1, grid.height + 1, palette)
@@ -341,7 +350,14 @@ class Sprite:
         self.layer.move(int(x), int(y))
 
     def set_frame(self, frame=None, rotation=None):
-        """Set the current graphic and rotation of the sprite."""
+        """
+        Set the current graphic and rotation of the sprite.
+
+        The possible values for rotation are: 0 - none, 1 - 90° clockwise,
+        2 - 180°, 3 - 90° counter-clockwise, 4 - mirrored, 5 - 90° clockwise
+        and mirrored, 6 - 180° and mirrored, 7 - 90° counter-clockwise and
+        mirrored.
+        """
 
         if frame is not None:
             self.frame = frame
