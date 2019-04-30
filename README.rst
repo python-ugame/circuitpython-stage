@@ -21,10 +21,6 @@ stage
 .. automodule:: stage
    :members:
 
-st7735r
-=======
-.. automodule:: st7735r
-   :members:
 
 ugame
 =======

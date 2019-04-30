@@ -353,11 +353,10 @@ class Sprite:
         """
         Set the current graphic and rotation of the sprite.
 
-        The possible values for rotation are: 0 - none, 1 - 90° clockwise,
-        2 - 180°, 3 - 90° counter-clockwise, 4 - mirrored, 5 - 90° clockwise
-        and mirrored, 6 - 180° and mirrored, 7 - 90° counter-clockwise and
-        mirrored.
-        """
+        The possible values for rotation are: 0 - none, 1 - 90 degrees
+        clockwise, 2 - 180 degrees, 3 - 90 degrees counter-clockwise, 4 -
+        mirrored, 5 - 90 degrees clockwise and mirrored, 6 - 180 degrees and
+        mirrored, 7 - 90 degrees counter-clockwise and mirrored.  """
 
         if frame is not None:
             self.frame = frame
