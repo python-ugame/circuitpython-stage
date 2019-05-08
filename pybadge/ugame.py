@@ -9,6 +9,7 @@ import gamepadshift
 import stage
 import displayio
 import busio
+import time
 
 
 K_X = 0x02
@@ -51,7 +52,11 @@ _tft_spi.try_lock()
 _tft_spi.configure(baudrate=24000000)
 _tft_spi.unlock()
 _fourwire = displayio.FourWire(_tft_spi, command=board.TFT_DC,
-                               chip_select=board.TFT_CS, reset=board.TFT_RST)
+                               chip_select=board.TFT_CS)
+_reset = digitalio.DigitalInOut(board.TFT_RST)
+_reset.switch_to_output(value=0)
+time.sleep(0.05)
+_reset.value = 1
 display = displayio.Display(_fourwire, _TFT_INIT, width=160, height=128,
                             rotation=0, backlight_pin=board.TFT_LITE)
 del _TFT_INIT
