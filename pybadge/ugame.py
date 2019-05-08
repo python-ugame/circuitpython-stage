@@ -57,6 +57,7 @@ _reset = digitalio.DigitalInOut(board.TFT_RST)
 _reset.switch_to_output(value=0)
 time.sleep(0.05)
 _reset.value = 1
+time.sleep(0.05)
 display = displayio.Display(_fourwire, _TFT_INIT, width=160, height=128,
                             rotation=0, backlight_pin=board.TFT_LITE)
 del _TFT_INIT
