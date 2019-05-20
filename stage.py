@@ -206,7 +206,7 @@ class BMP16:
             for color in range(self.colors):
                 buffer = f.read(4)
                 c = color565(buffer[0], buffer[1], buffer[2])
-                palette[color] = (c << 8) | (c >> 8)
+                palette[color] = ((c << 8) | (c >> 8)) & 0xffff
         return palette
 
     def read_data(self, offset=0, buffer=None):
