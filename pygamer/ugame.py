@@ -5,6 +5,7 @@ game console. See https://hackaday.io/project/27629-game
 
 import board
 import digitalio
+import analogio
 import gamepadshift
 import stage
 import displayio
