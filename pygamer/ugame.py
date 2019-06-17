@@ -72,22 +72,21 @@ class Buttons:
             digitalio.DigitalInOut(board.BUTTON_OUT),
             digitalio.DigitalInOut(board.BUTTON_LATCH),
         )
-        self.joy_x = analogio.AnalogIn(board.JOYSTICK_X)
-        self.joy_y = analogio.AnalogIn(board.JOYSTICK_Y)
+        self.joy_x = analogio.AnalogIn(board.JOYSTICK_Y)
+        self.joy_y = analogio.AnalogIn(board.JOYSTICK_X)
 
     def get_pressed(self):
         pressed = self.buttons.get_pressed()
-        dead = 500
-        center = 32767
-        x = self.joy_x.value
-        if x < center - dead:
-            pressed |= K_RIGHT
-        elif x > center + dead:
+        dead = 15000
+        x = self.joy_x.value - 32767
+        if x < -dead:
             pressed |= K_LEFT
-        y = self.joy_y.value
-        if y < center - dead:
+        elif x > dead:
+            pressed |= K_RIGHT
+        y = self.joy_y.value - 32767
+        if y < -dead:
             pressed |= K_UP
-        elif y > center + dead:
+        elif y > dead:
             pressed |= K_DOWN
         return pressed
 
