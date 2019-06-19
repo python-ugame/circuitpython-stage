@@ -72,8 +72,8 @@ class Buttons:
             digitalio.DigitalInOut(board.BUTTON_OUT),
             digitalio.DigitalInOut(board.BUTTON_LATCH),
         )
-        self.joy_x = analogio.AnalogIn(board.JOYSTICK_Y)
-        self.joy_y = analogio.AnalogIn(board.JOYSTICK_X)
+        self.joy_x = analogio.AnalogIn(board.JOYSTICK_X)
+        self.joy_y = analogio.AnalogIn(board.JOYSTICK_Y)
 
     def get_pressed(self):
         pressed = self.buttons.get_pressed()
