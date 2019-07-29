@@ -1,6 +1,7 @@
 import time
 import array
 import digitalio
+import audiocore
 import audioio
 import _stage
 
@@ -163,7 +164,7 @@ class Audio:
         played in the background.
         """
         self.stop()
-        wave = audioio.WaveFile(audio_file)
+        wave = audiocore.WaveFile(audio_file)
         self.audio.play(wave, loop=loop)
 
     def stop(self):
