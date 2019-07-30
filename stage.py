@@ -1,8 +1,12 @@
 import time
 import array
 import digitalio
-import audiocore
 import audioio
+try:
+    import audiocore
+except ImportError:
+    audiocore = audioio
+
 import _stage
 
 
