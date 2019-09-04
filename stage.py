@@ -298,8 +298,6 @@ def lzw_decode(data, code_size):
                 next(data)
     except StopIteration:
         return
-    finally:
-        del dictionary
 
 
 class GIF16:
@@ -315,7 +313,7 @@ class GIF16:
                 struct.unpack('<HHBBB', f.read(7)))
             self.palette_size = 1 << ((flags & 0x07) + 1)
         if not flags & 0x80 or self.palette_size > 16:
-            raise ValueError("16-color GIF expected")
+            raise NotImplementedError()
 
     def read_palette(self):
         palette = array.array('H', (0 for i in range(16)))
@@ -345,14 +343,11 @@ class GIF16:
                             break
                         f.seek(1, size)
                 elif block_type == 0x3b:
-                    raise ValueError("no frames")
+                    raise NotImplementedError()
             x, y, w, h, flags = struct.unpack('<HHHHB', f.read(9))
-            if flags & 0x80:
-                raise ValueError("local palette")
-            if flags & 0x40:
-                raise ValueError("interlaced")
-            if w != self.width or h != self.height or x != 0 or y != 0:
-                raise ValueError("partial frame")
+            if (flags & 0x80 or flags & 0x40 or
+                    w != self.width or h != self.height or x != 0 or y != 0):
+                raise NotImplementedError()
             min_code_size = f.read(1)[0]
             x = 0
             y = 0
