@@ -1,8 +1,3 @@
-"""
-A helper module that initializes the display and buttons for the PewPew M4
-game console.
-"""
-
 import board
 import digitalio
 import gamepad
@@ -16,6 +11,7 @@ K_RIGHT = 0x08
 K_UP = 0x10
 K_O = 0x20
 K_START = 0x40
+K_Z = 0x40
 K_SELECT = 0x00
 
 
