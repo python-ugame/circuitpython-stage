@@ -155,9 +155,11 @@ class Audio:
     last_audio = None
 
     def __init__(self, speaker_pin, mute_pin=None):
+        self.muted = True
+        self.buffer = bytearray(64)
         if mute_pin:
             self.mute_pin = digitalio.DigitalInOut(mute_pin)
-            self.mute_pin.switch_to_output(value=0)
+            self.mute_pin.switch_to_output(value=not self.muted)
         else:
             self.mute_pin = None
         self.audio = audioio.AudioOut(speaker_pin)
@@ -168,8 +170,10 @@ class Audio:
         repeat until stopped. This function doesn't block, the sound is
         played in the background.
         """
+        if self.muted:
+            return
         self.stop()
-        wave = audiocore.WaveFile(audio_file)
+        wave = audiocore.WaveFile(audio_file, self.buffer)
         self.audio.play(wave, loop=loop)
 
     def stop(self):
@@ -178,6 +182,7 @@ class Audio:
 
     def mute(self, value=True):
         """Enable or disable all sounds."""
+        self.muted = value
         if self.mute_pin:
             self.mute_pin.value = not value
 
