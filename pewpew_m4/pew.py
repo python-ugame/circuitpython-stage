@@ -135,8 +135,12 @@ keys = ugame.buttons.get_pressed
 def tick(delay):
     global _tick
 
+    now = time.monotonic()
     _tick += delay
-    time.sleep(max(0, _tick - time.monotonic()))
+    if _tick < now:
+        _tick = now
+    else:
+        time.sleep(_tick - now)
 
 
 class GameOver(Exception):
