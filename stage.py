@@ -317,8 +317,10 @@ class GIF16:
             self.width, self.height, flags, self.background, self.aspect = (
                 struct.unpack('<HHBBB', f.read(7)))
             self.palette_size = 1 << ((flags & 0x07) + 1)
-        if not flags & 0x80 or self.palette_size > 16:
+        if not flags & 0x80:
             raise NotImplementedError()
+        if self.palette_size > 16:
+            raise ValueError("Too many colors (%d/16)." % self.palette_size)
 
     def read_palette(self):
         palette = array.array('H', (0 for i in range(16)))
