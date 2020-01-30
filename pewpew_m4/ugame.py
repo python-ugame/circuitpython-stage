@@ -2,6 +2,7 @@ import board
 import digitalio
 import gamepad
 import stage
+import supervisor
 import time
 
 
@@ -34,9 +35,8 @@ class _Buttons:
         if buttons & K_Z:
             now = time.monotonic()
             if self.last_z_press:
-                if now - self.last_z_press > 5:
-                    import microcontroller
-                    microcontroller.reset()
+                if now - self.last_z_press > 2:
+                    supervisor.reload()
             else:
                 self.last_z_press = now
         else:
