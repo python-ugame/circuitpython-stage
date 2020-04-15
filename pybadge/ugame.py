@@ -37,7 +37,7 @@ _TFT_INIT = (
     b"\xc4\x02\x8a\xee"
     b"\xc5\x01\x0e" # _VMCTR1 VCOMH = 4V, VOML = -1.1V
     b"\x20\x00" # _INVOFF
-    b"\x36\x01\xa8" # _MADCTL
+    b"\x36\x01\xa0" # _MADCTL
     # 1 clk cycle nonoverlap, 2 cycle gate rise, 3 sycle osc equalie,
     # fix on VTL
     b"\x3a\x01\x05" # COLMOD - 16bit color

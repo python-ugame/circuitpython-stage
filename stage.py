@@ -216,7 +216,7 @@ class BMP16:
             f.seek(self.data - self.colors * 4)
             for color in range(self.colors):
                 buffer = f.read(4)
-                c = color565(buffer[0], buffer[1], buffer[2])
+                c = color565(buffer[2], buffer[1], buffer[0])
                 palette[color] = ((c << 8) | (c >> 8)) & 0xffff
         return palette
 
@@ -328,7 +328,7 @@ class GIF16:
             f.seek(13)
             for color in range(self.palette_size):
                 buffer = f.read(3)
-                c = color565(buffer[2], buffer[1], buffer[0])
+                c = color565(buffer[0], buffer[1], buffer[2])
                 palette[color] = ((c << 8) | (c >> 8)) & 0xffff
         return palette
 

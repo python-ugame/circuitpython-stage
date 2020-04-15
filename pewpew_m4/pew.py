@@ -104,8 +104,8 @@ _BANK = (
     b'\xddw\xe7~\xd0UU\x0e\xde\xdd~\xe7pUU\x0e~\xd7\xe7\xde\xd2UU\r\r\xd7\xdew'
     b'\x05UU\x02R\xdd}\xed%UUUU \x00\x02UUUUUUUUUUUUUUUUUUU')
 
-_PALETTE = array.array('H', (0, 5632, 10081, 7936, 17410, 8184, 10243, 53226,
-                       2820, 32586, 48964, 62213, 40710, 47830, 57311, 65535))
+_PALETTE = array.array('H', [0, 176, 11321, 248, 16418, 8184, 8259, 65402, 92,
+                             27130, 43260, 57501, 33022, 47830, 56319, 8184])
 
 
 K_X = 0x01

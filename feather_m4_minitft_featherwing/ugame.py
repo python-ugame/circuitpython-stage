@@ -29,7 +29,7 @@ _INIT_SEQUENCE = (
     b"\xc4\x02\x8a\xee"
     b"\xc5\x01\x0e"  # _VMCTR1 VCOMH = 4V, VOML = -1.1V
     b"\x20\x00"  # _INVOFF
-    b"\x36\x01\x68"  # _MADCTL bottom to top refresh
+    b"\x36\x01\x60"  # _MADCTL bottom to top refresh
     # 1 clk cycle nonoverlap, 2 cycle gate rise, 3 sycle osc equalie,
     # fix on VTL
     b"\x3a\x01\x05"  # COLMOD - 16bit color
