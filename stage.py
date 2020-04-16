@@ -156,7 +156,7 @@ class Audio:
 
     def __init__(self, speaker_pin, mute_pin=None):
         self.muted = True
-        self.buffer = bytearray(64)
+        self.buffer = bytearray(128)
         if mute_pin:
             self.mute_pin = digitalio.DigitalInOut(mute_pin)
             self.mute_pin.switch_to_output(value=not self.muted)
