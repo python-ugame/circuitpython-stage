@@ -20,7 +20,7 @@ _FONT = (
 )
 _SALT = const(132)
 
-_PALETTE = array.array('H', (0x0, 0x4a29, 0xc032, 0x98, 0xa0fc, 0xf42, 0x825b,
+_PALETTE = array.array('H', (0x0, 0x4a29, 0x6004, 0xf8, 0xfd, 0xf42, 0x825b,
                              0xf8, 0xfe, 0x125b, 0xcffb, 0xe0cf, 0xffff,
                              0x1ff8, 0xdbff, 0xffff))
 
@@ -191,6 +191,11 @@ def init():
         for y in range(0, 15):
             for x in range(0, 7):
                 _bank[c * 128 + y * 8 + x] = c | c << 4
+            _bank[c * 128 + y * 8 + 7] = c << 4
+        _bank[c * 128] = c
+        _bank[c * 128 + 7] = 0
+        _bank[c * 128 + 14 * 8] = c
+        _bank[c * 128 + 14 * 8 + 7] = 0
     tiles = stage.Bank(_bank, _PALETTE)
     _grid = stage.Grid(tiles, 10, 8)
     _grid.move(0, 0)
