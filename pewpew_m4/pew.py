@@ -59,7 +59,7 @@ def tick(delay):
         time.sleep(_tick - now)
 
 
-class GameOver(Exception):
+class GameOver(SystemExit):
     pass
 
 
