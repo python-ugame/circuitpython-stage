@@ -420,7 +420,7 @@ class Grid:
         self.height = height
         self.bank = bank
         self.palette = palette or bank.palette
-        self.buffer = buffer or bytearray(self.stride * height)
+        self.buffer = buffer or bytearray((self.stride * height)>>1)
         self.layer = _stage.Layer(self.stride, self.height, self.bank.buffer,
                                   self.palette, self.buffer)
 
