@@ -1,9 +1,8 @@
 import board
-import digitalio
-import gamepad
 import stage
 import supervisor
 import time
+import keypad
 
 
 K_X = 0x01
@@ -14,24 +13,30 @@ K_UP = 0x10
 K_O = 0x20
 K_START = 0x40
 K_Z = 0x40
-K_SELECT = 0x00
+K_SELECT = 0x80
 
 
 class _Buttons:
     def __init__(self):
-        self.buttons = gamepad.GamePad(
-            digitalio.DigitalInOut(board.BUTTON_X),
-            digitalio.DigitalInOut(board.BUTTON_DOWN),
-            digitalio.DigitalInOut(board.BUTTON_LEFT),
-            digitalio.DigitalInOut(board.BUTTON_RIGHT),
-            digitalio.DigitalInOut(board.BUTTON_UP),
-            digitalio.DigitalInOut(board.BUTTON_O),
-            digitalio.DigitalInOut(board.BUTTON_Z),
-        )
+        self.keys = keypad.Keys((board.BUTTON_X, board.BUTTON_DOWN,
+            board.BUTTON_LEFT, board.BUTTON_RIGHT, board.BUTTON_UP,
+            board.BUTTON_O, board.BUTTON_Z), value_when_pressed=False,
+            interval=0.05)
+        self.last_state = 0
+        self.event = keypad.Event(0, False)
         self.last_z_press = None
 
     def get_pressed(self):
-        buttons = self.buttons.get_pressed()
+        buttons = self.last_state
+        events = self.keys.events
+        while events:
+            if events.get_into(self.event):
+                bit = 1 << self.event.key_number
+                if self.event.pressed:
+                    buttons |= bit
+                    self.last_state |= bit
+                else:
+                    self.last_state &= ~bit
         if buttons & K_Z:
             now = time.monotonic()
             if self.last_z_press:
