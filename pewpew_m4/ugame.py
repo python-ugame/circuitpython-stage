@@ -51,4 +51,4 @@ class _Buttons:
 
 display = board.DISPLAY
 buttons = _Buttons()
-audio = stage.Audio(board.P5)
+audio = stage.Audio(board.SPEAKER)
