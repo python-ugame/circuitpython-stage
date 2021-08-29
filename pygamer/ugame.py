@@ -74,6 +74,7 @@ class _Buttons:
             now = time.monotonic()
             if self.last_z_press:
                 if now - self.last_z_press > 2:
+                    supervisor.set_next_code_file(None)
                     supervisor.reload()
             else:
                 self.last_z_press = now
