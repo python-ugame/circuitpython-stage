@@ -1,4 +1,9 @@
 import board
+"""
+A helper module that initializes the display and buttons for the
+Adafruit PyBadge game console.
+"""
+
 import stage
 import displayio
 import busio

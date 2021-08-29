@@ -1,3 +1,8 @@
+"""
+A helper module that initializes the display and buttons for the
+Adafruit PyGamer game console.
+"""
+
 import board
 import analogio
 import stage
