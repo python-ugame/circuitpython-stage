@@ -24,12 +24,12 @@ _PALETTE = array.array('H', (0x0, 0x4a29, 0x6004, 0xf8, 0xfd, 0xf42, 0x825b,
                              0xf8, 0xfe, 0x125b, 0xcffb, 0xe0cf, 0xffff,
                              0x1ff8, 0xdbff, 0xffff))
 
-K_X = 0x01
-K_DOWN = 0x02
-K_LEFT = 0x04
-K_RIGHT = 0x08
-K_UP = 0x10
-K_O = 0x20
+K_X = ugame.K_X
+K_DOWN = ugame.K_DOWN
+K_LEFT = ugame.K_LEFT
+K_RIGHT = ugame.K_RIGHT
+K_UP = ugame.K_UP
+K_O = ugame.K_O
 
 _tick = None
 _display = None
@@ -178,7 +178,7 @@ class Pix:
 
 
 def init():
-    global _tick, _display, _gamepad, _bitmap, _grid, _game
+    global _tick, _display, _bitmap, _grid, _game
 
     if _tick is not None:
         return

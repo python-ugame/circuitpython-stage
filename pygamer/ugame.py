@@ -1,16 +1,10 @@
-"""
-A helper module that initializes the display and buttons for the uGame
-game console. See https://hackaday.io/project/27629-game
-"""
-
 import board
-import digitalio
 import analogio
-import gamepadshift
 import stage
 import displayio
 import busio
 import time
+import keypad
 
 
 K_X = 0x01
@@ -47,49 +41,60 @@ _TFT_INIT = (
     b"\x13\x80\x0a" # _NORON
     b"\x29\x80\x64" # _DISPON
 )
-displayio.release_displays()
-_tft_spi = busio.SPI(clock=board.TFT_SCK, MOSI=board.TFT_MOSI)
-_tft_spi.try_lock()
-_tft_spi.configure(baudrate=24000000)
-_tft_spi.unlock()
-_fourwire = displayio.FourWire(_tft_spi, command=board.TFT_DC,
-                               chip_select=board.TFT_CS)
-_reset = digitalio.DigitalInOut(board.TFT_RST)
-_reset.switch_to_output(value=0)
-time.sleep(0.05)
-_reset.value = 1
-time.sleep(0.05)
-display = displayio.Display(_fourwire, _TFT_INIT, width=160, height=128,
-                            rotation=0, backlight_pin=board.TFT_LITE)
-del _TFT_INIT
-display.auto_brightness = True
 
 
-class Buttons:
+class _Buttons:
     def __init__(self):
-        self.buttons = gamepadshift.GamePadShift(
-            digitalio.DigitalInOut(board.BUTTON_CLOCK),
-            digitalio.DigitalInOut(board.BUTTON_OUT),
-            digitalio.DigitalInOut(board.BUTTON_LATCH),
-        )
+        self.keys = keypad.ShiftRegisterKeys(clock=board.BUTTON_CLOCK,
+            data=board.BUTTON_OUT, latch=board.BUTTON_LATCH, key_count=4,
+            interval=0.05)
+        self.last_state = 0
+        self.event = keypad.Event(0, False)
+        self.last_z_press = None
         self.joy_x = analogio.AnalogIn(board.JOYSTICK_X)
         self.joy_y = analogio.AnalogIn(board.JOYSTICK_Y)
 
     def get_pressed(self):
-        pressed = self.buttons.get_pressed()
+        buttons = self.last_state
+        events = self.keys.events
+        while events:
+            if events.get_into(self.event):
+                bit = 1 << self.event.key_number
+                if self.event.pressed:
+                    buttons |= bit
+                    self.last_state |= bit
+                else:
+                    self.last_state &= ~bit
+        if buttons & K_START:
+            now = time.monotonic()
+            if self.last_z_press:
+                if now - self.last_z_press > 2:
+                    supervisor.reload()
+            else:
+                self.last_z_press = now
+        else:
+            self.last_z_press = None
         dead = 15000
         x = self.joy_x.value - 32767
         if x < -dead:
-            pressed |= K_LEFT
+            buttons |= K_LEFT
         elif x > dead:
-            pressed |= K_RIGHT
+            buttons |= K_RIGHT
         y = self.joy_y.value - 32767
         if y < -dead:
-            pressed |= K_UP
+            buttons |= K_UP
         elif y > dead:
-            pressed |= K_DOWN
-        return pressed
+            buttons |= K_DOWN
+        return buttons
 
 
-buttons = Buttons()
+displayio.release_displays()
+_tft_spi = busio.SPI(clock=board.TFT_SCK, MOSI=board.TFT_MOSI)
+_fourwire = displayio.FourWire(_tft_spi, command=board.TFT_DC,
+                               chip_select=board.TFT_CS, reset=board.TFT_RST)
+display = displayio.Display(_fourwire, _TFT_INIT, width=160, height=128,
+                            rotation=0, backlight_pin=board.TFT_LITE,
+                            auto_refresh=False, auto_brightness=True)
+del _TFT_INIT
+buttons = _Buttons()
 audio = stage.Audio(board.SPEAKER, board.SPEAKER_ENABLE)
