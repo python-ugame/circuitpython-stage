@@ -3,6 +3,7 @@ import stage
 import busio
 import time
 import keypad
+import audiocore
 
 
 K_X = 0x01
@@ -51,15 +52,27 @@ class _Buttons:
         return buttons
 
 
-class DummyAudio:
-    def play(self, f, loop=False):
-        pass
+class _Audio:
+    last_audio = None
+
+    def __init__(self):
+        self.muted = True
+        self.buffer = bytearray(128)
+        self.audio = board.BUZZ
+
+    def play(self, audio_file, loop=False):
+        if self.muted:
+            return
+        self.stop()
+        wave = audiocore.WaveFile(audio_file, self.buffer)
+        self.audio.play(wave, loop=loop)
 
     def stop(self):
-        pass
+        self.audio.stop()
 
-    def mute(self, mute):
-        pass
+    def mute(self, value=True):
+        self.muted = value
 
-audio = DummyAudio()
+
+audio = _Audio()
 buttons = _Buttons()

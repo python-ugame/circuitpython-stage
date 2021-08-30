@@ -1,12 +1,16 @@
 import time
 import array
 import digitalio
-import audioio
-import struct
 try:
-    import audiocore
+    import audioio
 except ImportError:
-    audiocore = audioio
+    pass
+else:
+    try:
+        import audiocore
+    except ImportError:
+        audiocore = audioio
+import struct
 
 import _stage
 
@@ -160,7 +164,10 @@ class Audio:
             self.mute_pin.switch_to_output(value=not self.muted)
         else:
             self.mute_pin = None
-        self.audio = audioio.AudioOut(speaker_pin)
+        if audioio is None:
+            self.audio = audiopwmio.PWMAudioOut(speaker_pin)
+        else:
+            self.audio = audioio.AudioOut(speaker_pin)
 
     def play(self, audio_file, loop=False):
         """
