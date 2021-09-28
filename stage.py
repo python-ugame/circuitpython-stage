@@ -577,17 +577,54 @@ class Text:
         if x is not None:
             self.column = min(max(0, x), self.height - 1)
 
-    def text(self, text, hightlight=False):
-        """Display text starting at the current cursor location."""
+    def split(self, text):
+        """Split a text string into lines.
+
+        Splits on '\n' and width, yielding individual lines.
+        """
+        for line in text.split('\n'):
+            for i in range(0, len(line), self.width):
+                yield line[i:i + self.width]
+
+    def text(self, text, hightlight=False, align_center=False):
+        """Display text starting at the current cursor location.
+
+        Returns the width and height of the text in pixels.
+        """
+        cols = []
+        for line in self.split(text):
+            if align_center:
+                # "".rjust is not available
+                line = (" " * ((self.width - len(line)) // 2)) + line
+            for c in line:
+                if ord(c) >= 32:
+                    self.char(self.column, self.row, c, hightlight)
+                self.column += 1
+            cols.append(self.column)
+            self.column = 0
+            self.row += 1
+
+        w, h = max(cols) * 8, self.row * 8
+        self.column = 0
+        self.row = 0
+
+        return w, h
+
+"""
         for c in text:
             if ord(c) >= 32:
                 self.char(self.column, self.row, c, hightlight)
                 self.column += 1
+                cols[rows] += 1
             if self.column >= self.width or c == '\n':
                 self.column = 0
                 self.row += 1
                 if self.row >= self.height:
                     self.row = 0
+                rows += 1
+                cols.append(0)
+        return max(cols) * 8, rows * 8
+"""
 
     def clear(self):
         """Clear all text from the layer."""
