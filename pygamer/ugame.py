@@ -1,8 +1,3 @@
-"""
-A helper module that initializes the display and buttons for the
-Adafruit PyGamer game console.
-"""
-
 import board
 import analogio
 import stage
@@ -10,6 +5,8 @@ import displayio
 import busio
 import time
 import keypad
+import audioio
+import audiocore
 
 
 K_X = 0x01
@@ -94,6 +91,35 @@ class _Buttons:
         return buttons
 
 
+class _Audio:
+    last_audio = None
+
+    def __init__(self, speaker_pin, mute_pin=None):
+        self.muted = True
+        self.buffer = bytearray(128)
+        if mute_pin:
+            self.mute_pin = digitalio.DigitalInOut(mute_pin)
+            self.mute_pin.switch_to_output(value=not self.muted)
+        else:
+            self.mute_pin = None
+        self.audio = audioio.AudioOut(speaker_pin)
+
+    def play(self, audio_file, loop=False):
+        if self.muted:
+            return
+        self.stop()
+        wave = audiocore.WaveFile(audio_file, self.buffer)
+        self.audio.play(wave, loop=loop)
+
+    def stop(self):
+        self.audio.stop()
+
+    def mute(self, value=True):
+        self.muted = value
+        if self.mute_pin:
+            self.mute_pin.value = not value
+
+
 displayio.release_displays()
 _tft_spi = busio.SPI(clock=board.TFT_SCK, MOSI=board.TFT_MOSI)
 _fourwire = displayio.FourWire(_tft_spi, command=board.TFT_DC,
@@ -103,4 +129,4 @@ display = displayio.Display(_fourwire, _TFT_INIT, width=160, height=128,
                             auto_refresh=False, auto_brightness=True)
 del _TFT_INIT
 buttons = _Buttons()
-audio = stage.Audio(board.SPEAKER, board.SPEAKER_ENABLE)
+audio = _Audio(board.SPEAKER, board.SPEAKER_ENABLE)

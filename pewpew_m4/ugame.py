@@ -3,6 +3,8 @@ import stage
 import supervisor
 import time
 import keypad
+import audioio
+import audiocore
 
 
 K_X = 0x01
@@ -50,6 +52,28 @@ class _Buttons:
         return buttons
 
 
+class _Audio:
+    last_audio = None
+
+    def __init__(self, speaker_pin):
+        self.muted = True
+        self.buffer = bytearray(128)
+        self.audio = audioio.AudioOut(speaker_pin)
+
+    def play(self, audio_file, loop=False):
+        if self.muted:
+            return
+        self.stop()
+        wave = audiocore.WaveFile(audio_file, self.buffer)
+        self.audio.play(wave, loop=loop)
+
+    def stop(self):
+        self.audio.stop()
+
+    def mute(self, value=True):
+        self.muted = value
+
+
 display = board.DISPLAY
 buttons = _Buttons()
-audio = stage.Audio(board.SPEAKER)
+audio = _Audio(board.SPEAKER)

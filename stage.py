@@ -1,15 +1,6 @@
 import time
 import array
 import digitalio
-try:
-    import audioio
-except ImportError:
-    pass
-else:
-    try:
-        import audiocore
-    except ImportError:
-        audiocore = audioio
 import struct
 
 import _stage
@@ -150,46 +141,6 @@ def collide(ax0, ay0, ax1, ay1, bx0, by0, bx1=None, by1=None):
     if by1 is None:
         by1 = by0
     return not (ax1 < bx0 or ay1 < by0 or ax0 > bx1 or ay0 > by1)
-
-
-class Audio:
-    """Play sounds."""
-    last_audio = None
-
-    def __init__(self, speaker_pin, mute_pin=None):
-        self.muted = True
-        self.buffer = bytearray(128)
-        if mute_pin:
-            self.mute_pin = digitalio.DigitalInOut(mute_pin)
-            self.mute_pin.switch_to_output(value=not self.muted)
-        else:
-            self.mute_pin = None
-        if audioio is None:
-            self.audio = audiopwmio.PWMAudioOut(speaker_pin)
-        else:
-            self.audio = audioio.AudioOut(speaker_pin)
-
-    def play(self, audio_file, loop=False):
-        """
-        Start playing an open file ``audio_file``. If ``loop`` is ``True``,
-        repeat until stopped. This function doesn't block, the sound is
-        played in the background.
-        """
-        if self.muted:
-            return
-        self.stop()
-        wave = audiocore.WaveFile(audio_file, self.buffer)
-        self.audio.play(wave, loop=loop)
-
-    def stop(self):
-        """Stop playing whatever sound is playing."""
-        self.audio.stop()
-
-    def mute(self, value=True):
-        """Enable or disable all sounds."""
-        self.muted = value
-        if self.mute_pin:
-            self.mute_pin.value = not value
 
 
 class BMP16:
