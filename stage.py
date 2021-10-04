@@ -529,16 +529,26 @@ class Text:
             self.column = min(max(0, x), self.height - 1)
 
     def text(self, text, hightlight=False):
-        """Display text starting at the current cursor location."""
+        """
+        Display text starting at the current cursor location.
+        Return the dimensions of the rendered text.
+        """
+        longest = 0
+        tallest = 0
         for c in text:
-            if ord(c) >= 32:
+            if c != '\n':
                 self.char(self.column, self.row, c, hightlight)
                 self.column += 1
             if self.column >= self.width or c == '\n':
+                longest = max(longest, self.column)
                 self.column = 0
                 self.row += 1
                 if self.row >= self.height:
+                    tallest = max(tallest, self.row)
                     self.row = 0
+        longest = max(longest, self.column)
+        tallest = max(tallest, self.row) + (1 if self.column > 0 else 0)
+        return longest * 8, tallest * 8
 
     def clear(self):
         """Clear all text from the layer."""
