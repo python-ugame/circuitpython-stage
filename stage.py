@@ -567,11 +567,15 @@ class Stage:
     """
     buffer = bytearray(512)
 
-    def __init__(self, display, fps=6):
+    def __init__(self, display, fps=6, scale=None):
+        if scale is None:
+            self.scale = max(1, display.width // 128)
+        else:
+            self.scale = scale
         self.layers = []
         self.display = display
-        self.width = display.width
-        self.height = display.height
+        self.width = display.width // self.scale
+        self.height = display.height // self.scale
         self.last_tick = time.monotonic()
         self.tick_delay = 1 / fps
 
@@ -588,10 +592,17 @@ class Stage:
         """Update a rectangle of the screen."""
         if x1 is None:
             x1 = self.width
+        else:
+            x1 = min(max(1, x1), self.width)
         if y1 is None:
             y1 = self.height
+        else:
+            y1 = min(max(1, y1), self.height)
+        if x0 >= x1 or y0 >= y1:
+            return
         layers = [l.layer for l in self.layers]
-        _stage.render(x0, y0, x1, y1, layers, self.buffer, self.display)
+        _stage.render(x0, y0, x1, y1, layers, self.buffer,
+                      self.display, self.scale)
 
     def render_sprites(self, sprites):
         """Update the spots taken by all the sprites in the list."""
@@ -601,8 +612,8 @@ class Stage:
             y0 = max(0, min(self.height - 1, min(sprite.py, int(sprite.y))))
             x1 = max(1, min(self.width, max(sprite.px, int(sprite.x)) + 16))
             y1 = max(1, min(self.height, max(sprite.py, int(sprite.y)) + 16))
-            if x0 == x1 or y0 == y1:
+            if x0 >= x1 or y0 >= y1:
                 continue
             _stage.render(x0, y0, x1, y1, layers, self.buffer,
-                          self.display)
+                          self.display, self.scale)
             sprite._updated()
