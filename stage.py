@@ -262,6 +262,8 @@ def lzw_decode(data, code_size):
 
 
 class GIF16:
+    """Read 16-color GIF files."""
+
     def __init__(self, filename):
         self.filename = filename
 
@@ -564,6 +566,10 @@ class Stage:
     display connected to the device.
 
     The ``fps`` specifies the maximum frame rate to be enforced.
+
+    The ``scale`` specifies an optional scaling up of the display, to use
+    2x2 or 3x3, etc. pixels. If not specified, it is inferred from the display
+    size (displays wider than 256 pixels will have scale=2, for example).
     """
     buffer = bytearray(512)
 
