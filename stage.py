@@ -482,10 +482,6 @@ class Sprite:
     def update(self):
         pass
 
-    def _updated(self):
-        self.px = int(self.x)
-        self.py = int(self.y)
-
 
 class Text:
     """Text layer. For displaying text."""
@@ -584,6 +580,8 @@ class Stage:
         self.height = display.height // self.scale
         self.last_tick = time.monotonic()
         self.tick_delay = 1 / fps
+        self.vx = 0
+        self.vy = 0
 
     def tick(self):
         """Wait for the start of the next frame."""
@@ -594,32 +592,39 @@ class Stage:
         else:
             self.last_tick = time.monotonic()
 
-    def render_block(self, x0=0, y0=0, x1=None, y1=None):
+    def render_block(self, x0=None, y0=None, x1=None, y1=None):
         """Update a rectangle of the screen."""
+        if x0 is None:
+            x0 = self.vx
+        if y0 is None:
+            y0 = self.vy
         if x1 is None:
-            x1 = self.width
-        else:
-            x1 = min(max(1, x1), self.width)
+            x1 = self.width + self.vx
         if y1 is None:
-            y1 = self.height
-        else:
-            y1 = min(max(1, y1), self.height)
+            y1 = self.height + self.vy
+        x0 = min(max(0, x0 - self.vx), self.width - 1)
+        y0 = min(max(0, y0 - self.vy), self.height - 1)
+        x1 = min(max(1, x1 - self.vx), self.width)
+        y1 = min(max(1, y1 - self.vy), self.height)
         if x0 >= x1 or y0 >= y1:
             return
         layers = [l.layer for l in self.layers]
         _stage.render(x0, y0, x1, y1, layers, self.buffer,
-                      self.display, self.scale)
+                      self.display, self.scale, self.vx, self.vy)
 
     def render_sprites(self, sprites):
         """Update the spots taken by all the sprites in the list."""
         layers = [l.layer for l in self.layers]
         for sprite in sprites:
-            x0 = max(0, min(self.width - 1, min(sprite.px, int(sprite.x))))
-            y0 = max(0, min(self.height - 1, min(sprite.py, int(sprite.y))))
-            x1 = max(1, min(self.width, max(sprite.px, int(sprite.x)) + 16))
-            y1 = max(1, min(self.height, max(sprite.py, int(sprite.y)) + 16))
+            x = int(sprite.x) - self.vx
+            y = int(sprite.y) - self.vy
+            x0 = max(0, min(self.width - 1, min(sprite.px, x)))
+            y0 = max(0, min(self.height - 1, min(sprite.py, y)))
+            x1 = max(1, min(self.width, max(sprite.px, x) + 16))
+            y1 = max(1, min(self.height, max(sprite.py, y) + 16))
+            sprite.px = x
+            sprite.py = y
             if x0 >= x1 or y0 >= y1:
                 continue
             _stage.render(x0, y0, x1, y1, layers, self.buffer,
-                          self.display, self.scale)
-            sprite._updated()
+                          self.display, self.scale, self.vx, self.vy)
