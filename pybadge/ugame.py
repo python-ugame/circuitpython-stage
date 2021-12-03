@@ -6,6 +6,8 @@ import time
 import keypad
 import audioio
 import audiocore
+import digitalio
+import supervisor
 
 
 K_X = 0x01
@@ -48,7 +50,7 @@ class _Buttons:
     def __init__(self):
         self.keys = keypad.ShiftRegisterKeys(clock=board.BUTTON_CLOCK,
             data=board.BUTTON_OUT, latch=board.BUTTON_LATCH, key_count=8,
-            interval=0.05)
+            interval=0.05, value_when_pressed=True)
         self.last_state = 0
         self.event = keypad.Event(0, False)
         self.last_z_press = None
@@ -111,8 +113,10 @@ _tft_spi = busio.SPI(clock=board.TFT_SCK, MOSI=board.TFT_MOSI)
 _fourwire = displayio.FourWire(_tft_spi, command=board.TFT_DC,
                                chip_select=board.TFT_CS, reset=board.TFT_RST)
 display = displayio.Display(_fourwire, _TFT_INIT, width=160, height=128,
-                            rotation=0, backlight_pin=board.TFT_LITE,
-                            auto_refresh=False, auto_brightness=True)
+                            rotation=0, auto_refresh=False)
+# Work around broken backlight in CP 7.0
+_backlight = digitalio.DigitalInOut(board.TFT_LITE)
+_backlight.switch_to_output(value=1)
 del _TFT_INIT
 buttons = _Buttons()
 audio = _Audio(board.SPEAKER, board.SPEAKER_ENABLE)
