@@ -346,7 +346,7 @@ class PNG16:
             (
                 size, chunk, self.width, self.height, self.depth, self.mode,
                 self.compression, self.filters, self.interlaced, crc
-            ) = struct.unpack(">I4sIIBBBBBI", f.read(25))
+            ) = struct.unpack(">I4sIIBBBBB4s", f.read(25))
             assert size == 13  # header length
             assert chunk == b'IHDR'
             if self.depth != 4 or self.mode != 3 or self.interlaced != 0:
