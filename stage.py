@@ -2,6 +2,10 @@ import time
 import array
 import digitalio
 import struct
+try:
+    import zlib
+except ImportError:
+    pass
 
 import _stage
 
@@ -329,6 +333,62 @@ class GIF16:
         return buffer
 
 
+class PNG16:
+    """Read 16-color PNG files."""
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    def read_header(self):
+        with open(self.filename, 'rb') as f:
+            magic = f.read(8)
+            assert magic == b'\x89PNG\r\n\x1a\n'
+            (
+                size, chunk, self.width, self.height, self.depth, self.mode,
+                self.compression, self.filters, self.interlaced, crc
+            ) = struct.unpack(">I4sIIBBBBBI", f.read(25))
+            assert size == 13  # header length
+            assert chunk == b'IHDR'
+            if self.depth != 4 or self.mode != 3 or self.interlaced != 0:
+                raise ValueError("16-color non-interaced PNG expected")
+
+    def read_palette(self, palette=None):
+        if palette is None:
+            palette = array.array('H', (0 for i in range(16)))
+        with open(self.filename, 'rb') as f:
+            f.seek(8 + 25)
+            size, chunk = struct.unpack(">I4s", f.read(8))
+            assert chunk == b'PLTE'
+            for color in range(size // 3):
+                c = color565(*struct.unpack("BBB", f.read(3)))
+                palette[color] = ((c << 8) | (c >> 8)) & 0xffff
+        return palette
+
+    def read_data(self, buffer=None):
+        data = bytearray()
+        with open(self.filename, 'rb') as f:
+            f.seek(8 + 25)
+            while True:
+                size, chunk = struct.unpack(">I4s", f.read(8))
+                if chunk == b'IEND':
+                    break
+                elif chunk != b'IDAT':
+                    f.seek(size + 4, 1)
+                    continue
+                data.extend(f.read(size))
+                f.seek(4, 1)  # skip CRC
+        data = zlib.decompress(data)
+        line_size = self.width >> 1
+        if buffer is None:
+            buffer = bytearray(line_size * self.height)
+        for line in range(self.height):
+            a = line * line_size
+            b = line * (line_size + 1)
+            assert data[b] == 0  # no filter
+            buffer[a:a + line_size] = data[b + 1:b + 1 + line_size]
+        return buffer
+
+
 class Bank:
     """
     Store graphics for the tiles and sprites.
@@ -355,6 +415,8 @@ class Bank:
             image = GIF16(filename)
         elif filename.lower().endswith(".bmp"):
             image = BMP16(filename)
+        elif filename.lower().endswith(".png"):
+            image = PNG16(filename)
         else:
             raise ValueError("Unsupported format")
         image.read_header()
