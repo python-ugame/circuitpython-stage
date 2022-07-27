@@ -269,9 +269,7 @@ class Bank:
     @classmethod
     def from_image(cls, filename):
         """Read the bank from an image file."""
-        if filename.lower().endswith(".gif"):
-            image = GIF16(filename)
-        elif filename.lower().endswith(".bmp"):
+        if filename.lower().endswith(".bmp"):
             image = BMP16(filename)
         elif filename.lower().endswith(".png"):
             image = PNG16(filename)
