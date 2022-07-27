@@ -177,7 +177,7 @@ class BMP16:
         return palette
 
     def read_data(self, buffer=None):
-        line_size = self.width >> 1
+        line_size = (self.width + 1 ) >> 1
         if buffer is None:
             buffer = bytearray(line_size * self.height)
 
@@ -207,7 +207,7 @@ class PNG16:
             ) = struct.unpack(">I4sIIBBBBB4s", f.read(25))
             assert size == 13  # header length
             assert chunk == b'IHDR'
-            if self.depth != 4 or self.mode != 3 or self.interlaced != 0:
+            if self.depth not in  {4, 8} or self.mode != 3 or self.interlaced != 0:
                 raise ValueError("16-color non-interaced PNG expected")
 
     def read_palette(self, palette=None):
@@ -215,9 +215,15 @@ class PNG16:
             palette = array.array('H', (0 for i in range(16)))
         with open(self.filename, 'rb') as f:
             f.seek(8 + 25)
-            size, chunk = struct.unpack(">I4s", f.read(8))
-            assert chunk == b'PLTE'
-            for color in range(size // 3):
+            while True:
+                size, chunk = struct.unpack(">I4s", f.read(8))
+                if chunk == b'PLTE':
+                    break
+                f.seek(size + 4, 1)
+            colors = size // 3
+            if colors > 16:
+                raise ValueError("16-color PNG expected")
+            for color in range(colors):
                 c = color565(*struct.unpack("BBB", f.read(3)))
                 palette[color] = ((c << 8) | (c >> 8)) & 0xffff
         return palette
@@ -236,14 +242,30 @@ class PNG16:
                 data.extend(f.read(size))
                 f.seek(4, 1)  # skip CRC
         data = zlib.decompress(data)
-        line_size = self.width >> 1
+        line_size = (self.width + 1) >> 1
         if buffer is None:
             buffer = bytearray(line_size * self.height)
-        for line in range(self.height):
-            a = line * line_size
-            b = line * (line_size + 1)
-            assert data[b] == 0  # no filter
-            buffer[a:a + line_size] = data[b + 1:b + 1 + line_size]
+        if self.depth == 4:
+            for line in range(self.height):
+                a = line * line_size
+                b = line * (line_size + 1)
+                assert data[b] == 0  # no filter
+                buffer[a:a + line_size] = data[b + 1:b + 1 + line_size]
+        elif self.depth == 8:
+            for line in range(self.height):
+                a = line * line_size
+                b = line * (self.width + 1)
+                assert data[b] == 0  # no filter
+                b += 1
+                for col in range(line_size):
+                    buffer[a] = (data[b] & 0x0f) << 4
+                    b += 1
+                    try:
+                        buffer[a] |= data[b] & 0x0f
+                    except IndexError:
+                        pass
+                    b += 1
+                    a += 1
         return buffer
 
 
