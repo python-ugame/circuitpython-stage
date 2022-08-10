@@ -66,7 +66,6 @@ _fourwire = displayio.FourWire(_tft_spi, command=board.A3,
                                chip_select=board.A2, reset=board.A4)
 display = displayio.Display(_fourwire, _INIT_SEQUENCE, width=160, height=128,
                             rotation=0, backlight_pin=board.A5)
-display.auto_brightness = True
 buttons = gamepad.GamePad(
     digitalio.DigitalInOut(board.SCL),
     digitalio.DigitalInOut(board.D12),

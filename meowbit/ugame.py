@@ -15,7 +15,6 @@ K_UP = 0x20
 K_Z = 0x40
 
 display = board.DISPLAY
-display.auto_brightness = True
 display.auto_refresh = False
 
 
