@@ -1,11 +1,13 @@
+import audiobusio
+import audiocore
 import board
+import busio
+import digitalio
+import displayio
+import keypad
+import os
 import supervisor
 import time
-import keypad
-import audiocore
-import audiopwmio
-import displayio
-import busio
 
 
 K_X = 0x01
@@ -44,6 +46,7 @@ class _Buttons:
             now = time.monotonic()
             if self.last_z_press:
                 if now - self.last_z_press > 2:
+                    os.chdir('/')
                     supervisor.set_next_code_file(None)
                     supervisor.reload()
             else:
@@ -59,7 +62,14 @@ class _Audio:
     def __init__(self):
         self.muted = True
         self.buffer = bytearray(128)
-        self.audio = audiopwmio.PWMAudioOut(board.BUZZER)
+        self.audio = audiobusio.I2SOut(
+            board.I2S_BCLK,
+            board.I2S_LRCLK,
+            board.I2S_DIN,
+        )
+        self.gain_pin= digitalio.DigitalInOut(board.GAIN)
+        self.gain_pin.pull=digitalio.Pull.UP # 2dB gain
+        #self.gain_pin.switch_to_output(value=True) # 6dB gain
 
     def play(self, audio_file, loop=False):
         if self.muted:
