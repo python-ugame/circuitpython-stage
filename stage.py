@@ -521,6 +521,7 @@ class Stage:
             self.scale = scale
         self.layers = []
         self.display = display
+        display.root_group = None
         self.width = display.width // self.scale
         self.height = display.height // self.scale
         self.last_tick = time.monotonic()
