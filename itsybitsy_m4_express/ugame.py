@@ -62,10 +62,18 @@ _tft_spi = busio.SPI(clock=board.SCK, MOSI=board.MOSI)
 _tft_spi.try_lock()
 _tft_spi.configure(baudrate=24000000)
 _tft_spi.unlock()
-_fourwire = displayio.FourWire(_tft_spi, command=board.A3,
-                               chip_select=board.A2, reset=board.A4)
-display = displayio.Display(_fourwire, _INIT_SEQUENCE, width=160, height=128,
-                            rotation=0, backlight_pin=board.A5)
+try:
+    FourWire = displayio.FourWire
+except AttributeError:
+    from fourwire import FourWire
+_fourwire = FourWire(_tft_spi, command=board.A3,
+                     chip_select=board.A2, reset=board.A4)
+try:
+    Display = displayio.Display
+except AttributeError:
+    from busdisplay import BusDisplay as Display
+display = Display(_fourwire, _INIT_SEQUENCE, width=160, height=128,
+                  rotation=0, backlight_pin=board.A5)
 buttons = gamepad.GamePad(
     digitalio.DigitalInOut(board.SCL),
     digitalio.DigitalInOut(board.D12),

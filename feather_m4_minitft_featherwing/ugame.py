@@ -72,9 +72,17 @@ spi.configure(baudrate=24000000)
 spi.unlock()
 ss.pin_mode(8, ss.OUTPUT)
 ss.digital_write(8, True) # reset display
-display_bus = displayio.FourWire(spi, command=board.D6, chip_select=board.D5)
-display = displayio.Display(display_bus, _INIT_SEQUENCE, width=160, height=80,
-                            rowstart=24)
+try:
+    FourWire = displayio.FourWire
+except AttributeError:
+    from fourwire import FourWire
+display_bus = FourWire(spi, command=board.D6, chip_select=board.D5)
+try:
+    Display = displayio.Display
+except AttributeError:
+    from busdisplay import BusDisplay as Display
+display = Display(display_bus, _INIT_SEQUENCE, width=160, height=80,
+                  rowstart=24)
 del _INIT_SEQUENCE
 buttons = GamePadSeesaw(ss)
 audio = DummyAudio()

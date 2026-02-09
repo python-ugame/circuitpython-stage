@@ -110,10 +110,18 @@ class _Audio:
 
 displayio.release_displays()
 _tft_spi = busio.SPI(clock=board.TFT_SCK, MOSI=board.TFT_MOSI)
-_fourwire = displayio.FourWire(_tft_spi, command=board.TFT_DC,
-                               chip_select=board.TFT_CS, reset=board.TFT_RST)
-display = displayio.Display(_fourwire, _TFT_INIT, width=160, height=128,
-                            rotation=0, auto_refresh=False)
+try:
+    FourWire = displayio.FourWire
+except AttributeError:
+    from fourwire import FourWire
+_fourwire = FourWire(_tft_spi, command=board.TFT_DC,
+                     chip_select=board.TFT_CS, reset=board.TFT_RST)
+try:
+    Display = displayio.Display
+except AttributeError:
+    from busdisplay import BusDisplay as Display
+display = Display(_fourwire, _TFT_INIT, width=160, height=128,
+                  rotation=0, auto_refresh=False)
 # Work around broken backlight in CP 7.0
 _backlight = digitalio.DigitalInOut(board.TFT_LITE)
 _backlight.switch_to_output(value=1)
